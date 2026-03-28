@@ -1454,3 +1454,201 @@ header {
       <rect class="chart-bar" x="30" y="20" width="40" height="80"></rect>
       <rect class="chart-bar" x="90" y="60" width="40" height="40"></rect>
       <rect class="chart-bar" x="150" y="80"
+      <rect class="chart-bar" x="150" y="80" width="40" height="40"></rect>
+      <rect class="chart-bar" x="210" y="90" width="40" height="30"></rect>
+      <line x1="20" y1="100" x2="270" y2="100" class="chart-axis" stroke-width="1"></line>
+      <text x="30" y="115" class="chart-label" transform="rotate(0,30,115)">Manual</text>
+      <text x="90" y="115" class="chart-label" transform="rotate(0,90,115)">Replit</text>
+      <text x="150" y="115" class="chart-label" transform="rotate(0,150,115)">Replit</text>
+      <text x="150" y="115" class="chart-label" transform="rotate(0,150,115)">Bolt</text>
+      <text x="210" y="115" class="chart-label" transform="rotate(0,210,115)">YouWare</text>
+    </svg>
+  </div>
+
+  <!-- Inline PWA service‑worker registration (inline) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/sw.js')
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+
+  <!-- Inline service‑worker JS (stub for PWA; add full logic in production) -->
+  <script>
+    const CACHE_NAME = 'youware-review-2026';
+    const urlsToCache = [
+      '/',
+      '/index.html',
+      '/manifest.json'
+    ];
+    self.addEventListener('install', event => {
+      event.waitUntil(
+        caches.open(CACHE_NAME)
+          .then(cache => cache.addAll(urlsToCache))
+      );
+    });
+    self.addEventListener('fetch', event => {
+      event.respondWith(
+        caches.match(event.request)
+          .then(response => response || fetch(event.request))
+      );
+    });
+  </script>
+
+  <!-- Inline JS (minimal, interactive elements) -->
+  <script>
+    // A/B headline rotator (4 variants)
+    const headlines = [
+      "YouWare Review 2026: #1 AI Vibe Coding Platform - Expert Guide",
+      "YouWare 2026: Build Apps 3x Faster with AI Vibe Coding",
+      "YouWare AI Vibe Coding Platform: The 2026 Review",
+      "YouWare Review 2026: The #1 AI Platform for No‑Code Apps"
+    ];
+    const heroHeadline = document.getElementById('hero-headline');
+    if (heroHeadline) {
+      const abIndex = Math.floor(Math.random() * headlines.length);
+      heroHeadline.textContent = headlines[abIndex];
+    }
+
+    // Mobile nav toggle
+    const mobileToggle = document.querySelector('.mobile-toggle');
+    const mainNav = document.querySelector('#main-nav');
+    if (mobileToggle && mainNav) {
+      mobileToggle.addEventListener('click', () => {
+        const isOpen = mainNav.getAttribute('open') === 'true';
+        mainNav.toggleAttribute('open', !isOpen);
+        mobileToggle.setAttribute('aria-expanded', !isOpen);
+      });
+    }
+
+    // Skip link focus handling
+    const skipLink = document.querySelector('.skip-link');
+    if (skipLink) {
+      skipLink.addEventListener('click', () => {
+        document.querySelector('#main-content').focus();
+      });
+    }
+
+    // FAQ toggles
+    const faqQs = document.querySelectorAll('.faq-q');
+    faqQs.forEach(btn => {
+      const panel = document.getElementById(btn.getAttribute('aria-controls'));
+      btn.addEventListener('click', () => {
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !expanded);
+        panel.hidden = expanded;
+      });
+    });
+
+    // Quiz progress bar
+    const quizForm = document.getElementById('quiz-form');
+    const quizStart = document.getElementById('quiz-start');
+    const startBtn = document.getElementById('start-quiz');
+    const quizBar = document.getElementById('quiz-bar');
+    const quizRec = document.getElementById('quiz-rec');
+    const quizResults = document.getElementById('quiz-results');
+
+    startBtn.addEventListener('click', () => {
+      quizStart.hidden = true;
+      quizForm.hidden = false;
+    });
+
+    const updateProgress = () => {
+      const radioGroups = [
+        'goal', 'dev', 'team', 'usage', 'backend', 'export', 'budget'
+      ];
+      let filled = 0;
+      radioGroups.forEach(name => {
+        const checked = quizForm.querySelector(`input[name="${name}"]:checked`);
+        if (checked) filled += 1;
+      });
+      quizBar.style.width = `${(filled / radioGroups.length) * 100}%`;
+    };
+
+    quizForm.addEventListener('change', updateProgress);
+
+    quizForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = new FormData(quizForm);
+      const goal = formData.get('goal');
+      const dev = formData.get('dev');
+      const team = formData.get('team');
+      const budget = formData.get('budget');
+
+      let recText = '';
+      if (goal === 'learning' || dev === 'non' || dev === 'beginner') {
+        recText = 'You should start with the free or entry plan to learn AI vibe coding and build simple apps.';
+      } else if (budget === 'low' || team === 'alone') {
+        recText = 'A personal or starter plan with limited team access will match your budget and solo workflow.';
+      } else if (budget === 'mid' || team === 'small') {
+        recText = 'A mid‑tier team plan with YouBase backend and export is ideal for your small team and MVP‑focused work.';
+      } else {
+        recText = 'An enterprise or high‑tier plan with full‑stack features, team collaboration, and export fits your budget and team size.';
+      }
+
+      quizRec.textContent = recText;
+      quizResults.hidden = false;
+      window.location.hash = '#quiz';
+    });
+
+    // Current year in footer
+    const currentYear = new Date().getFullYear();
+    const currentYearEl = document.getElementById('current-year');
+    if (currentYearEl) currentYearEl.textContent = currentYear;
+
+    // Exit‑intent popup (simple)
+    let exitIntentShown = false;
+    const exitModal = document.querySelector('.exit-intent');
+    const exitBtns = document.querySelectorAll('.exit-modal .btn');
+
+    const showExitIntent = () => {
+      if (!exitIntentShown && exitModal) {
+        exitModal.style.display = 'flex';
+        exitIntentShown = true;
+      }
+    };
+
+    // Basic exit intent on mouse move toward top
+    document.addEventListener('mouseout', e => {
+      if (!exitIntentShown && e.clientY < 10) {
+        setTimeout(showExitIntent, 800);
+      }
+    });
+
+    // Close on escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && exitModal && exitModal.style.display === 'flex') {
+        exitModal.style.display = 'none';
+      }
+    });
+
+    // CTAs in exit modal
+    exitBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.location.href = 'https://www.linkconnector.com/ta.php?lc=007949163635007981&atid=YouWareWeb';
+      });
+    });
+
+    // Comment form submit
+    const commentForm = document.querySelector('.comment-form');
+    if (commentForm) {
+      commentForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const rating = document.getElementById('rating').value;
+        const comment = document.getElementById('comment').value.trim();
+        if (name && email && rating && comment) {
+          alert('Thank you for your comment. It will be reviewed and may appear on the page.');
+          commentForm.reset();
+        } else {
+          alert('Please fill in all fields.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
